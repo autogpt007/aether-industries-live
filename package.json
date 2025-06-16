@@ -50,6 +50,7 @@
     "react-hook-form": "^7.58.0",
     "recharts": "^2.15.3",
     "tailwind-merge": "^3.3.1",
+    "tailwindcss": "next",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.25.64"
   },
@@ -58,7 +59,6 @@
     "@types/react": "19.1.8",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.10",
     "typescript": "^5.0.2"
   }
 }
