@@ -6,7 +6,7 @@ import ProductForm from '../../ProductForm';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // This is the correct type definition for a Next.js page with a dynamic route.
-// Added optional searchParams to potentially satisfy PageProps constraint more fully.
+// Added optional searchParams to satisfy PageProps constraint more fully.
 interface EditProductPageProps {
   params: {
     id: string;
@@ -31,20 +31,21 @@ export async function generateMetadata({ params }: EditProductPageProps): Promis
   }
 }
 
-export default async function EditProductPage({ params }: EditProductPageProps) {
+export default async function EditProductPage({ params /*, searchParams */ }: EditProductPageProps) {
   let product;
 
   // Added error handling to prevent the server from crashing.
   try {
     product = await getProductById(params.id);
   } catch (error: any) {
-    console.error(`Failed to fetch product with ID ${params.id}. Error: ${error.message}`, error.stack);
-    // Return a more specific error component or message for debugging
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error(`Failed to fetch product with ID ${params.id}. Error: ${errorMessage}`, errorStack);
     return (
         <div className="p-8 text-center text-red-500">
             <h1 className="text-xl font-bold">Error Loading Product Data</h1>
             <p>Could not retrieve product data for ID: {params.id}.</p>
-            <p>Details: {error.message || "An unexpected error occurred."}</p>
+            <p>Details: {errorMessage}</p>
             <p className="mt-4 text-xs text-muted-foreground">Check server logs for more details. Error occurred in EditProductPage.</p>
         </div>
     );
