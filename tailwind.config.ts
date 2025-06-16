@@ -7,7 +7,7 @@ export default {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/contexts/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/globals.css', // Added this line
+    // './app/globals.css', // Removed this line
   ],
   theme: {
     extend: {
