@@ -1,0 +1,19 @@
+{
+  "name": "functions",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "node lib/index.js",
+    "start": "npm run build && npm run serve"
+  },
+  "dependencies": {
+    "firebase-functions": "^4.4.0",
+    "firebase-admin": "^11.7.0",
+    "next": "^13.4.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2"
+  }
+}

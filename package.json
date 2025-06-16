@@ -1,18 +1,13 @@
 {
-  "name": "nextn",
-  "version": "0.1.0",
+  "name": "aether-industries-live",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "genkit:watch": "genkit start --ts src/ai/dev.ts",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 4000",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "start": "next start",
+    "deploy": "npm run build && firebase deploy --only hosting,functions"
   },
-  "engines": {
-    "node": ">=20 <21"
-  },
+
   "dependencies": {
     "@genkit-ai/googleai": "^1.8.0",
     "@genkit-ai/next": "^1.8.0",
@@ -44,29 +39,21 @@
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^16.5.0",
-    "express": "^4.19.2",
-    "firebase": "^11.9.1",
-    "firebase-admin": "^13.4.0",
+    "firebase": "^9.23.0",
     "genkit": "^1.8.0",
     "lucide-react": "^0.475.0",
-    "next": "15.3.3",
+    "next": "^13.4.1",
     "patch-package": "^8.0.0",
-    "react": "^18.3.1",
+    "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^18.2.0",
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.2"
   },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "genkit-cli": "^1.8.0",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+  "devDependencies":{
+    "typescript": "^5.0.2"
   }
 }
