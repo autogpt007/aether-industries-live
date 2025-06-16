@@ -1,7 +1,8 @@
+
 import * as functions from "firebase-functions";
 import { initializeApp, getApps } from "firebase-admin/app";
 import next from "next";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 
 // Initialize Admin if not already done
 if (!getApps().length) initializeApp();
