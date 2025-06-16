@@ -1,11 +1,6 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  @apply font-body;
-}
 
 @layer base {
   :root {
@@ -59,7 +54,7 @@ body {
     --background: 220 20% 6%; /* Very dark desaturated blue */
     --foreground: 210 40% 95%; /* Off-white/light blue */
 
-    --card: 220 20% 9%; 
+    --card: 220 20% 9%;
     --card-foreground: 210 40% 95%;
 
     --popover: 220 20% 7%;
@@ -83,7 +78,7 @@ body {
     --border: 220 15% 18%;
     --input: 220 15% 18%;
     --ring: 170 70% 50%;
-    
+
     --chart-1: 170 70% 45%;
     --chart-2: 190 60% 55%;
     --chart-3: 210 50% 65%;
@@ -103,10 +98,11 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
+    /* @apply border-border; */ /* Removed problematic global border application */
   }
   body {
     @apply bg-background text-foreground;
+    @apply font-body;
     @apply antialiased;
   }
   h1, h2, h3, h4, h5, h6 {

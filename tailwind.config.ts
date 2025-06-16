@@ -4,10 +4,10 @@ import type {Config} from 'tailwindcss';
 export default {
   darkMode: ['class'],
   content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}', // Correctly scan root app directory
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}', // Scan components in src
-    './src/contexts/**/*.{js,ts,jsx,tsx,mdx}', // Scan contexts if they use Tailwind
-    // Add other src subdirectories if they contain JSX with Tailwind classes
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/contexts/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/globals.css', // Added this line
   ],
   theme: {
     extend: {
