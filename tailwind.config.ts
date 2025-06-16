@@ -3,12 +3,13 @@ import type {Config} from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
-  content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/contexts/**/*.{js,ts,jsx,tsx,mdx}',
-    // './app/globals.css', // Removed this line
-  ],
+  content: {
+    files: [ // Changed from array to object with 'files' key
+      './app/**/*.{js,ts,jsx,tsx,mdx}',
+      './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+      './src/contexts/**/*.{js,ts,jsx,tsx,mdx}',
+    ],
+  },
   theme: {
     extend: {
       fontFamily: {
