@@ -1,4 +1,3 @@
-
 // src/app/products/[slug]/page.tsx
 'use client';
 
@@ -8,15 +7,53 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CheckCircle, ShieldAlert, ShoppingCart, FileText, Info, FileBadge, MessageCircle, ThermometerIcon, AlertTriangle, ListChecks, PackageSearch, Check, Loader2, Star, Heart, XCircle, Clock } from 'lucide-react';
 import Link from 'next/link';
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react'; // Removed 'use' import as it's not standard
 import { useCart, type CartProduct } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { getProductBySlug, type Product, type RelatedProductInfo, type ProductReview } from '@/lib/firebaseServices';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Metadata } from 'next'; // Added Metadata import
 
 interface ProductDetailPageProps {
-  params: { slug: string }; // Updated based on how Next.js passes params
+  params: { slug: string };
 }
+
+// Added generateMetadata function
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+  const { slug } = params;
+  if (!slug || typeof slug !== 'string') {
+    console.error('generateMetadata (ProductDetail): Invalid or missing product slug in params:', params);
+    return {
+      title: 'Invalid Product Request',
+      description: 'The product you are looking for is invalid.',
+    };
+  }
+  try {
+    const product = await getProductBySlug(slug);
+    if (!product) {
+      return {
+        title: 'Product Not Found',
+        description: 'The product you are looking for could not be found.',
+      };
+    }
+    return {
+      title: `${product.name} | Aether Industries`,
+      description: product.shortDescription,
+      openGraph: {
+        title: product.name,
+        description: product.shortDescription,
+        images: product.primaryImageUrl ? [{ url: product.primaryImageUrl }] : [],
+      },
+    };
+  } catch (error) {
+    console.error(`Error generating metadata for product slug ${slug}:`, error);
+    return {
+      title: 'Error Loading Product Information',
+      description: 'There was an issue loading details for this product.',
+    };
+  }
+}
+
 
 const defaultProduct: Product = {
   id: '0',
@@ -24,10 +61,12 @@ const defaultProduct: Product = {
   slug: 'not-found',
   category: 'Unknown',
   images: [{ url: 'https://placehold.co/800x800.png', alt: 'Placeholder Image for Not Found Product', dataAiHint: 'question mark page blank' }],
+  primaryImageUrl: 'https://placehold.co/800x800.png', // Ensure primaryImageUrl is present
+  otherImageUrls: [],
   shortDescription: "The refrigerant or accessory you are looking for could not be found. Please check the URL or browse our categories.",
   longDescription: "<p>We're sorry, but the product you're trying to view doesn't exist or has been moved. Please check the URL or use our search and filters to find the refrigerant or HVAC/R accessory you need. You can also <a href='/contact' class='text-accent hover:underline'>contact our support team</a> for assistance.</p>",
   technicalSpecs: {},
-  safetyInformation: { precautions: [], epaCertification: null, sdsUrl: null },
+  safetyInformation: { precautions: [], epaCertification: null, sdsFileUrl: null },
   applicationNotes: "",
   price: null,
   isPurchasable: false,
@@ -47,7 +86,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const slug = params.slug;
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<Product['images'][0] | null>(null);
+  const [selectedImage, setSelectedImage] = useState<Product['images'][0] | null>(null); // Type for selectedImage
   const { addToCart, isItemInCart } = useCart();
   const { toast } = useToast();
   const [isAdding, setIsAdding] = useState(false);
@@ -61,7 +100,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
         if (productFromDb) {
           setCurrentProduct(productFromDb);
           setSelectedImage(productFromDb.images?.[0] || null);
-          document.title = `${productFromDb.name} | Aether Industries`;
+          // document.title is now handled by generateMetadata
           if (isItemInCart(productFromDb.id)) {
             setIsAdded(true);
           } else {
@@ -70,7 +109,6 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
         } else {
           setCurrentProduct(defaultProduct);
           setSelectedImage(defaultProduct.images[0]);
-          document.title = `Product Not Found | Aether Industries`;
         }
         setIsLoadingProduct(false);
       };
@@ -94,7 +132,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       productId: currentProduct.id,
       name: currentProduct.name,
       slug: currentProduct.slug,
-      imageUrl: currentProduct.images?.[0]?.url || 'https://placehold.co/100x100.png',
+      imageUrl: currentProduct.primaryImageUrl || currentProduct.images?.[0]?.url || 'https://placehold.co/100x100.png', // Prioritize primaryImageUrl
       dataAiHint: currentProduct.images?.[0]?.dataAiHint || 'product image',
       price: currentProduct.price,
       isQuoteItem: !currentProduct.isPurchasable,
@@ -156,6 +194,10 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       </div>
     );
   }
+  
+  // Ensure selectedImage has a fallback if primaryImageUrl is also missing from currentProduct
+  const displaySelectedImageUrl = selectedImage?.url || currentProduct.primaryImageUrl || currentProduct.images?.[0]?.url || 'https://placehold.co/800x800.png';
+
 
   return (
     <div className="space-y-12 md:space-y-16 py-4 md:py-8">
@@ -164,8 +206,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
         <div className="md:sticky md:top-24 space-y-4">
           <div className="relative aspect-square w-full overflow-hidden rounded-lg border shadow-lg">
             <Image
-              src={selectedImage?.url || currentProduct.images?.[0]?.url || 'https://placehold.co/800x800.png'}
-              alt={selectedImage?.alt || currentProduct.name}
+              src={displaySelectedImageUrl}
+              alt={selectedImage?.altText || currentProduct.name} // Corrected selectedImage.alt to selectedImage.altText
               width={800}
               height={800}
               className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-105"
@@ -173,23 +215,23 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               priority
             />
           </div>
-          {currentProduct.images && currentProduct.images.length > 1 && (
+          {currentProduct.otherImageUrls && currentProduct.otherImageUrls.length > 0 && ( // Check otherImageUrls
             <div className="grid grid-cols-4 gap-2 sm:gap-3">
-              {currentProduct.images.slice(0,4).map((img, idx) => (
+              {currentProduct.otherImageUrls.slice(0,4).map((imgUrl, idx) => ( // Iterate otherImageUrls
                 <button
                   key={idx}
                   className={`relative aspect-square rounded-md overflow-hidden border-2 transition-all duration-150 ease-in-out hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2
-                              ${selectedImage?.url === img.url ? 'border-accent scale-105 shadow-md' : 'border-border hover:border-primary/50'}`}
-                  onClick={() => setSelectedImage(img)}
+                              ${selectedImage?.url === imgUrl ? 'border-accent scale-105 shadow-md' : 'border-border hover:border-primary/50'}`}
+                  onClick={() => setSelectedImage({ url: imgUrl, altText: `Product image ${idx + 1}`, dataAiHint: 'product thumbnail' })} // Create a temporary image object for selection
                   aria-label={`View image ${idx + 1} for ${currentProduct.name}`}
                   >
                   <Image
-                    src={img.url}
-                    alt={img.alt}
+                    src={imgUrl}
+                    alt={`Product image ${idx + 1}`}
                     width={200}
                     height={200}
                     className="w-full h-full object-cover"
-                    data-ai-hint={img.dataAiHint}
+                    data-ai-hint={'product thumbnail'} // Generic hint for thumbnails
                   />
                 </button>
               ))}
@@ -210,7 +252,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               {currentProduct.name}
             </h1>
              {currentProduct.sku && <p className="text-xs text-muted-foreground">SKU: {currentProduct.sku}</p>}
-            {currentProduct.averageRating && currentProduct.averageRating > 0 && currentProduct.reviewCount && (
+            {currentProduct.averageRating && currentProduct.averageRating > 0 && currentProduct.reviewCount && currentProduct.reviewCount > 0 && (
               <div className="flex items-center gap-2 text-sm">
                 {renderStars(currentProduct.averageRating)}
                 <span className="text-muted-foreground">({currentProduct.reviewCount} reviews)</span>
@@ -310,10 +352,10 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           <TabsContent value="safety" className="p-6 md:p-8">
              <h3 className="font-headline text-xl font-semibold mb-4 flex items-center text-primary"><ShieldAlert className="mr-2 h-5 w-5"/>Safety Information & SDS</h3>
             <div className="prose dark:prose-invert max-w-none prose-headings:font-headline prose-ul:list-disc prose-ul:pl-5 prose-li:mb-1 text-base">
-                {currentProduct.safetyInformation?.sdsUrl && (
+                {currentProduct.safetyInformation?.sdsFileUrl && (
                     <p className="mb-6">
                         <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
-                          <Link href={currentProduct.safetyInformation.sdsUrl} target="_blank" rel="noopener noreferrer">
+                          <Link href={currentProduct.safetyInformation.sdsFileUrl} target="_blank" rel="noopener noreferrer">
                             <FileBadge className="mr-2 h-4 w-4"/> Download Safety Data Sheet (SDS)
                           </Link>
                         </Button>
@@ -331,7 +373,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                     <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-900/30 border-l-4 border-orange-500 text-orange-700 dark:text-orange-300 rounded-md text-sm"
                          dangerouslySetInnerHTML={{ __html: currentProduct.safetyInformation.epaCertification }} />
                 )}
-                {!currentProduct.safetyInformation?.sdsUrl && !currentProduct.safetyInformation?.precautions?.length && !currentProduct.safetyInformation?.epaCertification && (
+                {!currentProduct.safetyInformation?.sdsFileUrl && !currentProduct.safetyInformation?.precautions?.length && !currentProduct.safetyInformation?.epaCertification && (
                     <p className="text-muted-foreground">No specific safety information available for this product.</p>
                 )}
             </div>

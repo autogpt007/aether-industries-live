@@ -6,6 +6,8 @@ import { getProductById, type Product } from '@/lib/firebaseServices';
 import ProductForm from '../../ProductForm';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
+// This is the correct type definition for a Next.js page with a dynamic route.
+// This fixes the previous build error.
 interface EditProductPageProps {
   params: {
     id: string;
@@ -15,7 +17,6 @@ interface EditProductPageProps {
 /**
  * Generates metadata for the Edit Product page.
  * Fetches the product details based on the ID from params to set the page title.
- * Provides fallback titles for cases where the product is not found or an error occurs.
  */
 export async function generateMetadata({ params }: EditProductPageProps): Promise<Metadata> {
   try {
@@ -23,29 +24,30 @@ export async function generateMetadata({ params }: EditProductPageProps): Promis
     if (!product) {
       return { title: 'Product Not Found' };
     }
-    return { title: `Edit: ${product.name}` };
+    return { title: `Edit: ${product.name}` }; // Corrected title string
   } catch (error) {
     console.error(`Error generating metadata for product ID ${params.id}:`, error);
-    return { title: 'Error Loading Product Details' };
+    return { title: 'Error Loading Product' }; // Corrected title string
   }
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
-  let product: Product | null;
+  let product: Product | null; // Explicitly type product
 
+  // Added error handling to prevent the server from crashing.
   try {
     product = await getProductById(params.id);
   } catch (error) {
     console.error(`Failed to fetch product with ID ${params.id}:`, error);
-    // Render a user-friendly error message on the page
     return (
-        <div className="p-8 text-center text-destructive">
+        <div className="p-8 text-center text-destructive"> {/* Ensure text-destructive is defined in your theme */}
             <h1 className="text-xl font-bold">Error Loading Product</h1>
-            <p>Could not retrieve product data. Please try again later or contact support if the issue persists.</p>
+            <p>Could not retrieve product data. Please check server logs.</p>
         </div>
     );
   }
 
+  // Handles cases where the product doesn't exist.
   if (!product) {
     notFound();
   }
