@@ -1,21 +1,22 @@
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getProductById, type Product } from '@/lib/firebaseServices';
+import { getProductById } from '@/lib/firebaseServices';
 import ProductForm from '../../ProductForm';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle } from 'lucide-react'; // Import for error icon
 
+// This is the correct type definition for a Next.js page with a dynamic route.
+// Added optional searchParams to potentially satisfy PageProps constraint more fully.
 interface EditProductPageProps {
   params: {
     id: string;
   };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 /**
  * Generates metadata for the Edit Product page.
  * Fetches the product details based on the ID from params to set the page title.
- * Provides fallback titles for cases where the product is not found or an error occurs.
  */
 export async function generateMetadata({ params }: EditProductPageProps): Promise<Metadata> {
   try {
@@ -25,28 +26,31 @@ export async function generateMetadata({ params }: EditProductPageProps): Promis
     }
     return { title: `Edit: ${product.name}` };
   } catch (error) {
-    console.error(`Error generating metadata for product ID ${params.id} in app/admin/products/edit/[id]/page.tsx:`, (error as Error).message, (error as Error).stack);
-    return { title: 'Error Loading Product Details' };
+    console.error(`Error generating metadata for product ID ${params.id}:`, error);
+    return { title: 'Error Loading Product' };
   }
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
-  let product: Product | null = null;
+  let product;
 
+  // Added error handling to prevent the server from crashing.
   try {
     product = await getProductById(params.id);
-  } catch (error) {
-    console.error(`Failed to fetch product with ID ${params.id} in app/admin/products/edit/[id]/page.tsx. Error: ${(error as Error).message}`, (error as Error).stack);
+  } catch (error: any) {
+    console.error(`Failed to fetch product with ID ${params.id}. Error: ${error.message}`, error.stack);
+    // Return a more specific error component or message for debugging
     return (
-        <div className="p-8 text-center text-destructive bg-destructive/10 rounded-lg max-w-2xl mx-auto my-10 border border-destructive">
-            <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-destructive" />
-            <h1 className="text-2xl font-bold mb-2">Error Loading Product</h1>
-            <p className="text-base mb-1">We encountered a problem retrieving the product data for ID: <span className="font-mono bg-destructive/20 px-1 rounded">{params.id}</span>.</p>
-            <p className="text-sm">Please check the server logs for more details or try again later. If the issue persists, contact support.</p>
+        <div className="p-8 text-center text-red-500">
+            <h1 className="text-xl font-bold">Error Loading Product Data</h1>
+            <p>Could not retrieve product data for ID: {params.id}.</p>
+            <p>Details: {error.message || "An unexpected error occurred."}</p>
+            <p className="mt-4 text-xs text-muted-foreground">Check server logs for more details. Error occurred in EditProductPage.</p>
         </div>
     );
   }
 
+  // Handles cases where the product doesn't exist.
   if (!product) {
     notFound();
   }
