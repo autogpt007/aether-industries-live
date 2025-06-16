@@ -1,3 +1,4 @@
+
 {
   "name": "aether-industries-live",
   "private": true,
@@ -51,13 +52,13 @@
     "recharts": "^2.15.3",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.25.64"
+    "zod": "^3.25.64",
+    "tailwindcss": "4.1.10"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "next",
     "@types/react": "19.1.8",
     "autoprefixer": "^10.4.19",
-    "tailwindcss": "4.1.10",
     "typescript": "^5.0.2"
   }
 }
