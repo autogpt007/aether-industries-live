@@ -1,23 +1,18 @@
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getProductById } from '@/lib/firebaseServices';
+import { getProductById, type Product } from '@/lib/firebaseServices'; // Ensure Product type is imported
 import ProductForm from '../../ProductForm';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-// This is the correct type definition for a Next.js page with a dynamic route.
-// Added optional searchParams to satisfy PageProps constraint more fully.
+// This is the correct type definition that should fix build errors.
 interface EditProductPageProps {
   params: {
     id: string;
   };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined }; // Added for broader PageProps compatibility
 }
 
-/**
- * Generates metadata for the Edit Product page.
- * Fetches the product details based on the ID from params to set the page title.
- */
 export async function generateMetadata({ params }: EditProductPageProps): Promise<Metadata> {
   try {
     const product = await getProductById(params.id);
@@ -31,10 +26,9 @@ export async function generateMetadata({ params }: EditProductPageProps): Promis
   }
 }
 
-export default async function EditProductPage({ params /*, searchParams */ }: EditProductPageProps) {
-  let product;
+export default async function EditProductPage({ params }: EditProductPageProps) {
+  let product: Product | null = null;
 
-  // Added error handling to prevent the server from crashing.
   try {
     product = await getProductById(params.id);
   } catch (error: any) {
@@ -51,19 +45,22 @@ export default async function EditProductPage({ params /*, searchParams */ }: Ed
     );
   }
 
-  // Handles cases where the product doesn't exist.
   if (!product) {
-    notFound();
+    notFound(); // This will throw and stop rendering, product is Product below
   }
 
+  // At this point, 'product' is guaranteed to be of type Product
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
        <Card className="mb-8">
         <CardHeader>
           <CardTitle>Edit Product</CardTitle>
+          {/* product.name is safe to access here due to notFound() check */}
           <CardDescription>You are currently editing: <span className="font-semibold">{product.name}</span></CardDescription>
         </CardHeader>
       </Card>
+      {/* ProductForm initialData prop expects Product | undefined. 
+          Since 'product' is narrowed to 'Product' here, it's assignable. */}
       <ProductForm initialData={product} />
     </div>
   );
