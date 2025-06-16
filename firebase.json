@@ -1,0 +1,27 @@
+{
+  "hosting": {
+    "source": ".", // IMPORTANT: If your Next.js app (with package.json) is in a subfolder,
+                   // change "." to that subfolder's name (e.g., "frontend" or "my-app").
+                   // This tells Firebase where to look for your application code.
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": { // Indicates this hosting site is intended to be served by an App Hosting backend
+      "region": "us-central1" // Choose the region of your App Hosting backend
+    }
+  }
+  // If you are defining App Hosting backends declaratively here (less common for initial setup):
+  // "apphosting": {
+  //   "backends": [
+  //     {
+  //       "id": "YOUR_BACKEND_ID", // Replace with your backend ID
+  //       "region": "us-central1", // Or your region
+  //       "source": "." // << CRITICAL: This must point to the directory containing your Next.js app's package.json
+  //                     // If your Next.js app is in a subfolder (e.g., "my-next-app"),
+  //                     // change "." to "my-next-app".
+  //     }
+  //   ]
+  // }
+}

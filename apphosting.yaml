@@ -1,0 +1,30 @@
+# Settings to manage and configure a Firebase App Hosting backend.
+# https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  # Specifies the minimum number of instances to keep running.
+  # minInstances: 0 # Default is 0
+
+  # Specifies the maximum number of instances App Hosting can scale up to.
+  maxInstances: 1
+
+  # The number of concurrent requests an instance can receive.
+  # concurrency: 80 # Default is 80
+
+  # The maximum amount of time (in seconds) a request can take before being
+  # cancelled.
+  # timeoutSeconds: 60 # Default is 60
+
+  # CPU and memory resources for your instances.
+  # cpu: 1 # Default value is 1
+  # memoryMiB: 512 # Default value is 512
+
+env:
+  - variable: DATABASE_URL
+    value: YOUR_DATABASE_URL_PLACEHOLDER # Replace with your database connection string or reference a secret
+    availability:
+      - RUNTIME
+  - variable: FIREBASE_SERVICE_ACCOUNT_BASE64
+    value: YOUR_FIREBASE_SERVICE_ACCOUNT_BASE64_PLACEHOLDER # Replace with your Base64 encoded service account JSON or reference a secret
+    availability:
+      - RUNTIME

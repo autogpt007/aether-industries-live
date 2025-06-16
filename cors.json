@@ -1,0 +1,11 @@
+[
+  {
+    "origin": [
+      "http://localhost:3000",
+      "https://*.cloudworkstations.dev"
+    ],
+    "method": ["GET", "POST", "PUT", "HEAD", "OPTIONS"],
+    "responseHeader": ["Content-Type", "Access-Control-Allow-Origin", "Authorization", "X-Goog-Resumable"],
+    "maxAgeSeconds": 3600
+  }
+]
