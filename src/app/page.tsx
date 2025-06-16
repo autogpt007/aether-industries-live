@@ -3,10 +3,10 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, Zap, Users, ShieldCheck, Award, Thermometer, Settings, BookOpen, Truck, Cpu, AlertCircle } from 'lucide-react';
+import { Package, ShieldCheck, Award, Thermometer, Settings, Truck, Cpu, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getProducts, type Product } from '@/lib/firebaseServices'; // Import getProducts
+import { getProducts, type Product } from '@/lib/firebaseServices';
 
 export const metadata: Metadata = {
   title: 'Aether Industries - Your Premier Freon™ Refrigerant Supplier',
@@ -37,11 +37,11 @@ export default async function HomePage() {
   let fetchError = false;
 
   try {
-    featuredProducts = await getProducts({ limit: 3 });
+    const allProducts = await getProducts(); // Fetch all products
+    featuredProducts = allProducts.slice(0, 3); // Then take the first 3
   } catch (error) {
     console.error("Failed to fetch featured products for homepage:", error);
     fetchError = true;
-    // featuredProducts will remain an empty array
   }
 
   return (
@@ -89,7 +89,7 @@ export default async function HomePage() {
                 <CardHeader className="p-0 relative">
                   <Image 
                       src={product.primaryImageUrl || product.images?.[0]?.url || 'https://placehold.co/600x400.png'} 
-                      alt={product.images?.[0]?.altText || product.name} 
+                      alt={product.name} 
                       width={600} 
                       height={400} 
                       className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300" 
@@ -189,3 +189,5 @@ export default async function HomePage() {
     </div>
   );
 }
+
+    
